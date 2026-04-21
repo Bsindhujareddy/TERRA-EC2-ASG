@@ -1,17 +1,6 @@
 variable "region" {
   default = "us-east-1"
 }
-
-variable "vpc_id" {
-  description = "VPC ID where ASG will be deployed"
-  type        = string
-}
-
-variable "subnet_ids" {
-  description = "Public subnet IDs"
-  type        = list(string)
-}
-
 variable "ami_id" {
   description = "AMI ID for EC2"
   type        = string
