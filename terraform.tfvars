@@ -1,10 +1,10 @@
 region = "us-east-1"
 
-vpc_id = "vpc-xxxxxxxx"
+vpc_id = "vpc-04d31ea7cf2e80457"
 
 subnet_ids = [
-  "subnet-xxxxxx1",
-  "subnet-xxxxxx2"
+  "subnet-0843a416141578f24",
+  "subnet-0073b614cff98d0b4"
 ]
 
 ami_id        = "ami-0c02fb55956c7d316"   # Amazon Linux 2 (us-east-1)
