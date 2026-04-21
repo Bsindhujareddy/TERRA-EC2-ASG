@@ -17,7 +17,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/your-username/asg-ec2.git',
+                git url: 'https://github.com/Bsindhujareddy/TERRA-EC2-ASG.git',
                     branch: 'main',
                     credentialsId: 'github-cred'
             }
