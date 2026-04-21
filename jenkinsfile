@@ -25,10 +25,8 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-cred'
-                ]]) {
+                 withAWS(credentials: 'aws-cred', region: "${REGION}") {
+                {
 
                     sh '''
                         cd asg-ec2
