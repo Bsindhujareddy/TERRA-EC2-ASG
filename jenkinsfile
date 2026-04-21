@@ -28,7 +28,6 @@ pipeline {
             steps {
                 withAWS(credentials: 'aws-cred', region: 'us-east-1') {
                     sh '''
-                        cd asg-ec2
                         terraform init -input=false
                     '''
                 }
@@ -43,7 +42,6 @@ pipeline {
             steps {
                 withAWS(credentials: 'aws-cred', region: 'us-east-1') {
                     sh '''
-                        cd asg-ec2
                         terraform validate
                         terraform plan -out=tfplan
                         terraform apply -auto-approve tfplan
@@ -62,7 +60,6 @@ pipeline {
 
                 withAWS(credentials: 'aws-cred', region: 'us-east-1') {
                     sh '''
-                        cd asg-ec2
                         terraform destroy -auto-approve
                     '''
                 }
