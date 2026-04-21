@@ -1,14 +1,3 @@
-
-
-data "terraform_remote_state" "vpc" {
-  backend = "s3"
-
-  config = {
-    bucket = "mnikbsoft-terraform-state-bucket"
-    key    = "vpc/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
 provider "aws" {
   region = var.region
 }
@@ -18,7 +7,7 @@ provider "aws" {
 # ----------------------
 resource "aws_security_group" "ec2_sg" {
   name   = "asg-ec2-sg"
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id = var.vpc_id
 
   ingress {
     from_port   = 22
@@ -68,11 +57,12 @@ resource "aws_launch_template" "lt" {
 # ----------------------
 # Auto Scaling Group
 # ----------------------
-resource "aws_security_group" "ec2_sg" {
-  name   = "asg-ec2-sg"
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+resource "aws_autoscaling_group" "asg" {
+  desired_capacity = var.asg_desired_capacity
+  max_size         = var.asg_max_size
+  min_size         = var.asg_min_size
 
-  vpc_zone_identifier = data.terraform_remote_state.vpc.outputs.public_subnet_ids
+  vpc_zone_identifier = var.subnet_ids
 
   launch_template {
     id      = aws_launch_template.lt.id
