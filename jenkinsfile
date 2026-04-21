@@ -44,10 +44,7 @@ pipeline {
                 expression { params.ACTION == 'apply' }
             }
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-cred'
-                ]]) {
+                 withAWS(credentials: 'aws-cred', region: "${REGION}") { {
 
                     sh '''
                         cd asg-ec2
