@@ -1,0 +1,101 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'ACTION',
+            choices: ['apply', 'destroy'],
+            description: 'Choose Terraform action'
+        )
+    }
+
+    environment {
+        TF_IN_AUTOMATION = "true"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/your-username/asg-ec2.git',
+                    branch: 'main',
+                    credentialsId: 'github-cred'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-cred'
+                ]]) {
+
+                    sh '''
+                        cd asg-ec2
+                        export AWS_DEFAULT_REGION=us-east-1
+
+                        terraform init -input=false
+                    '''
+                }
+            }
+        }
+
+        # ---------------- APPLY ----------------
+        stage('Terraform Apply') {
+            when {
+                expression { params.ACTION == 'apply' }
+            }
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-cred'
+                ]]) {
+
+                    sh '''
+                        cd asg-ec2
+                        export AWS_DEFAULT_REGION=us-east-1
+
+                        terraform validate
+                        terraform plan -out=tfplan
+                        terraform apply -auto-approve tfplan
+                    '''
+                }
+            }
+        }
+
+        # ---------------- DESTROY ----------------
+        stage('Terraform Destroy') {
+            when {
+                expression { params.ACTION == 'destroy' }
+            }
+            steps {
+                input message: '⚠️ Confirm destroy of ASG infrastructure?'
+
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-cred'
+                ]]) {
+
+                    sh '''
+                        cd asg-ec2
+                        export AWS_DEFAULT_REGION=us-east-1
+
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo "✅ ${params.ACTION} completed successfully"
+        }
+        failure {
+            echo "❌ ${params.ACTION} failed"
+        }
+    }
+}
