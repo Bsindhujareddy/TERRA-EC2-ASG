@@ -11,6 +11,7 @@ pipeline {
 
     environment {
         TF_IN_AUTOMATION = "true"
+        AWS_DEFAULT_REGION = "us-east-1"
     }
 
     stages {
@@ -25,31 +26,24 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                 withAWS(credentials: 'aws-cred', region: "${REGION}") {
-                {
-
+                withAWS(credentials: 'aws-cred', region: 'us-east-1') {
                     sh '''
                         cd asg-ec2
-                        export AWS_DEFAULT_REGION=us-east-1
-
                         terraform init -input=false
                     '''
                 }
             }
         }
-    }
+
         # ---------------- APPLY ----------------
         stage('Terraform Apply') {
             when {
                 expression { params.ACTION == 'apply' }
             }
             steps {
-                 withAWS(credentials: 'aws-cred', region: "${REGION}") { {
-
+                withAWS(credentials: 'aws-cred', region: 'us-east-1') {
                     sh '''
                         cd asg-ec2
-                        export AWS_DEFAULT_REGION=us-east-1
-
                         terraform validate
                         terraform plan -out=tfplan
                         terraform apply -auto-approve tfplan
@@ -66,12 +60,9 @@ pipeline {
             steps {
                 input message: '⚠️ Confirm destroy of ASG infrastructure?'
 
-                 withAWS(credentials: 'aws-cred', region: "${REGION}") { {
-
+                withAWS(credentials: 'aws-cred', region: 'us-east-1') {
                     sh '''
                         cd asg-ec2
-                        export AWS_DEFAULT_REGION=us-east-1
-
                         terraform destroy -auto-approve
                     '''
                 }
