@@ -35,7 +35,7 @@ pipeline {
             }
         }
 
-        # ---------------- APPLY ----------------
+        // ---------------- APPLY ----------------
         stage('Terraform Apply') {
             when {
                 expression { params.ACTION == 'apply' }
@@ -52,7 +52,7 @@ pipeline {
             }
         }
 
-        # ---------------- DESTROY ----------------
+        // ---------------- DESTROY ----------------
         stage('Terraform Destroy') {
             when {
                 expression { params.ACTION == 'destroy' }
